@@ -7,9 +7,11 @@ def error_message_detail(error, error_detail: sys):
     file_name = exc_tb.tb_frame.f_code.co_filename
 
     error_message = (
-        f"Error occurred in python script name [{file_name}] "
-        f"line number [{exc_tb.tb_lineno}] "
-        f"error message [{str(error)}]"
+    f"\n{'='*50}\n"
+    f"File: {file_name}\n"
+    f"Line: {exc_tb.tb_lineno}\n"
+    f"Error: {str(error)}\n"
+    f"{'='*50}"
     )
 
     return error_message

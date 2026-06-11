@@ -1,6 +1,9 @@
+import os
 from KidneyDiseaseClassification.constants import *
 from KidneyDiseaseClassification.utils.common import read_yaml,create_directories
-from KidneyDiseaseClassification.entity.config_entity import (DataIngestionConfig,PreapreBaseModelConfig)
+from KidneyDiseaseClassification.entity.config_entity import (DataIngestionConfig,
+                                                              PreapreBaseModelConfig,
+                                                              TrainingConfig)
 
 class ConfigurationManager:
     def __init__(
@@ -35,7 +38,7 @@ class ConfigurationManager:
         prepare_base_model_config = PreapreBaseModelConfig(
             root_dir= config.root_dir,
             base_model_path= config.base_model_path,
-            updated_base_model_path= config.update_base_model,
+            updated_base_model_path= config.update_base_model_path,
             params_image_size= self.params.IMAGE_SIZE,
             params_learing_rate = self.params.LEARNING_RATE,
             params_include_top=  self.params.INCLUDE_TOP,
@@ -45,3 +48,25 @@ class ConfigurationManager:
         )
 
         return prepare_base_model_config
+
+    def get_training_config(self)->TrainingConfig:
+        training = self.config.training
+        prepare_base_model = self.config.prepare_base_model
+        params = self.params
+        training_data = os.path.join(self.config.data_ingestion.unzip_dir,"kidney-ct-scan-image")
+        create_directories(
+            [training.root_dir]
+        )
+
+        training_config = TrainingConfig(
+            root_dir =training.root_dir,
+            trained_model_path = training.trained_model_path,
+            updated_base_model_path=prepare_base_model.update_base_model_path,
+            training_data=training_data,
+            params_epochs=params.EPOCHS,
+            params_batch_size=params.BATCH_SIZE,
+            params_is_augmentation=params.AUGMENTATION,
+            params_image_size=params.IMAGE_SIZE
+        )
+
+        return training_config

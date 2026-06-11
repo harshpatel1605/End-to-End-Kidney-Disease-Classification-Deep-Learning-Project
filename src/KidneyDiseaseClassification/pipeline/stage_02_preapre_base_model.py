@@ -22,6 +22,6 @@ if __name__ == '__main__':
         logger.info(f">>>>>>>>>> stage {STAGE_NAME} started <<<<<<<<<<")
         obj = PrepareBaseModelTrainingPipeline()
         obj.main()
-        logger.info(f">>>>>>>>>> stage {STAGE_NAME} started <<<<<<<<<<\n\nX===========X")
+        logger.info(f">>>>>>>>>> stage {STAGE_NAME} Completed <<<<<<<<<<\n\nX===========X")
     except Exception as e:
         raise CustomException(e,sys)
