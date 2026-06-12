@@ -4,7 +4,7 @@ from KidneyDiseaseClassification.utils.logger import logger
 from KidneyDiseaseClassification.utils.exception import CustomException
 import sys
 
-STAGE_NAME = "Prepare Base Model stage"
+STAGE_NAME = "Prepare Base Model "
 
 class PrepareBaseModelTrainingPipeline:
     def __init__(self):

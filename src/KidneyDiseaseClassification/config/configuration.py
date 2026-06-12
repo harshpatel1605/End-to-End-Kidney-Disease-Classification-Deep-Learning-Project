@@ -3,7 +3,8 @@ from KidneyDiseaseClassification.constants import *
 from KidneyDiseaseClassification.utils.common import read_yaml,create_directories
 from KidneyDiseaseClassification.entity.config_entity import (DataIngestionConfig,
                                                               PreapreBaseModelConfig,
-                                                              TrainingConfig)
+                                                              TrainingConfig,
+                                                              EvaluationConfig)
 
 class ConfigurationManager:
     def __init__(
@@ -70,3 +71,15 @@ class ConfigurationManager:
         )
 
         return training_config
+    
+    def get_evaluation_config(self)->EvaluationConfig:
+        eval_config = EvaluationConfig(
+            path_of_model="artifacts/training/model.keras",
+            training_data="artifacts/data_ingestion/kidney-ct-scan-image",
+            all_params=self.params,
+            mlflow_uri="https://dagshub.com/harshpatel16052005/End-to-End-Kidney-Disease-Classification-Deep-Learning-Project.mlflow",
+            params_image_size = self.params.IMAGE_SIZE,
+            params_batch_size=self.params.BATCH_SIZE
+    )
+
+        return eval_config
