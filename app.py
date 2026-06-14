@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import os
+import uvicorn
 
 from KidneyDiseaseClassification.utils.common import decodeImage
 from KidneyDiseaseClassification.pipeline.prediction import PredictionPipeline
@@ -71,8 +72,6 @@ def predict(data: PredictionRequest):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
     uvicorn.run(
         app,
         host="0.0.0.0",
