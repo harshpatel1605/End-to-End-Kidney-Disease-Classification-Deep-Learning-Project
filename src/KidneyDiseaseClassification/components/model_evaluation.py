@@ -21,7 +21,6 @@ class Evaluation:
     def _valid_generator(self):
 
         datagenerator_kwargs = dict(
-            rescale = 1./255,
             validation_split = 0.30
         )
 
@@ -59,7 +58,7 @@ class Evaluation:
     def log_into_mlflow(self):
         mlflow.set_tracking_uri(self.config.mlflow_uri)
         mlflow.set_registry_uri(self.config.mlflow_uri)
-        mlflow.set_experiment("kidney-disease-classification")  
+        mlflow.set_experiment("kidney_disease_classification")  
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
         
         with mlflow.start_run():
@@ -74,6 +73,6 @@ class Evaluation:
                 # There are other ways to use the Model Registry, which depends on the use case,
                 # please refer to the doc for more information:
                 # https://mlflow.org/docs/latest/model-registry.html#api-workflow
-                mlflow.keras.log_model(self.model, "model", registered_model_name="VGG16Model")
+                mlflow.keras.log_model(self.model, "model", registered_model_name="EfficientNetB0")
             else:
                 mlflow.keras.log_model(self.model, "model")

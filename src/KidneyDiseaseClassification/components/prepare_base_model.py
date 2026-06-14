@@ -10,7 +10,7 @@ class PrepareBaseModel:
         self.config = config
 
     def get_base_model(self):
-        self.model = tf.keras.applications.vgg16.VGG16(
+        self.model = tf.keras.applications.EfficientNetB0(
             input_shape = self.config.params_image_size,
             weights = self.config.params_weights,
             include_top = self.config.params_include_top
@@ -20,28 +20,28 @@ class PrepareBaseModel:
 
 
     @staticmethod
-    def _prepare_full_model(model , classes , freeze_all , freeze_till , learning_rate):
+    def _prepare_full_model(model, classes, freeze_all, freeze_till, learning_rate):
         if freeze_all:
             for layer in model.layers:
-                model.trainable = False
-        elif(freeze_till is not None) and (freeze_till > 0):
+                layer.trainable = False        
+        elif (freeze_till is not None) and (freeze_till > 0):
             for layer in model.layers[:-freeze_till]:
-                model.trainable = True
+                layer.trainable = False        
 
-        flatten_in = tf.keras.layers.Flatten()(model.output)
-        prediction = tf.keras.layers.Dense(
-            units=classes,
-            activation='softmax'
-        )(flatten_in)
+        x = tf.keras.layers.GlobalAveragePooling2D()(model.output)
+        x = tf.keras.layers.Dense(256, activation='relu')(x)
+        x = tf.keras.layers.BatchNormalization()(x)
+        x = tf.keras.layers.Dropout(0.4)(x)                           
+        prediction = tf.keras.layers.Dense(units=classes, activation='softmax')(x)
 
         full_model = tf.keras.models.Model(
-            inputs = model.input,
-            outputs = prediction
+            inputs=model.input,
+            outputs=prediction
         )
 
         full_model.compile(
-            optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate),
-            loss=tf.keras.losses.CategoricalFocalCrossentropy(),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),  
+            loss=tf.keras.losses.CategoricalCrossentropy(),                   
             metrics=['accuracy']
         )
 

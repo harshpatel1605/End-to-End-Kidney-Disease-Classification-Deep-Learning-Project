@@ -39,13 +39,13 @@ stages:
         - 224
         - 3
         INCLUDE_TOP: false
-        LEARNING_RATE: 0.0001
+        LEARNING_RATE: 2e-05
         WEIGHTS: imagenet
     outs:
     - path: artifacts/prepare_base_model
       hash: md5
-      md5: 92d65e5f1c1dff6e2c8ba0b2d4c08c89.dir
-      size: 118051258
+      md5: 8a13bc6ae5b90438a970681f58e8cfde.dir
+      size: 35190356
       nfiles: 2
   model_training:
     cmd: python 
@@ -58,8 +58,8 @@ stages:
       nfiles: 7361
     - path: artifacts/prepare_base_model
       hash: md5
-      md5: 92d65e5f1c1dff6e2c8ba0b2d4c08c89.dir
-      size: 118051258
+      md5: 8a13bc6ae5b90438a970681f58e8cfde.dir
+      size: 35190356
       nfiles: 2
     - path: config/config.yaml
       hash: md5
@@ -71,9 +71,9 @@ stages:
       size: 1245
     params:
       params.yaml:
-        AUGMENTATION: false
+        AUGMENTATION: true
         BATCH_SIZE: 16
-        EPOCHS: 4
+        EPOCHS: 30
         IMAGE_SIZE:
         - 224
         - 224
@@ -81,8 +81,8 @@ stages:
     outs:
     - path: artifacts/training/model.keras
       hash: md5
-      md5: 78ff86149a155ab0987aa65990709a41
-      size: 59337962
+      md5: 3745037021e74a55aef2239d2055e3db
+      size: 20904936
   model_evaluation:
     cmd: python 
       src/KidneyDiseaseClassification/pipeline/stage_04_model_evaluation.py
@@ -94,8 +94,8 @@ stages:
       nfiles: 7361
     - path: artifacts/training/model.keras
       hash: md5
-      md5: 78ff86149a155ab0987aa65990709a41
-      size: 59337962
+      md5: 3745037021e74a55aef2239d2055e3db
+      size: 20904936
     - path: config/config.yaml
       hash: md5
       md5: 4b9f4a861cf794148c767d26aa5b9872
@@ -103,8 +103,8 @@ stages:
     - path: 
         src/KidneyDiseaseClassification/pipeline/stage_04_model_evaluation.py
       hash: md5
-      md5: be394a71600badebc9974c64de1e6b78
-      size: 955
+      md5: 3757ec25707f5604c964e3bf8830b47e
+      size: 953
     params:
       params.yaml:
         BATCH_SIZE: 16
@@ -115,5 +115,5 @@ stages:
     outs:
     - path: scores.json
       hash: md5
-      md5: 9e42574fc2a5605864cdac63e72f9f78
-      size: 70
+      md5: 7f46e0da4de6bda3383d0ad5434e8c80
+      size: 71

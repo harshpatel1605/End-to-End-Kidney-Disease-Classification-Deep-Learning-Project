@@ -15,10 +15,15 @@ ensure==1.0.2
 joblib
 types-PyYAML
 scipy==1.13.1
-Flask==3.0.3
-Flask-Cors==4.0.1
+
+fastapi
+uvicorn
+jinja2
+python-multipart
+
 gdown
 gunicorn
 boto3
 dagshub
+
 -e .

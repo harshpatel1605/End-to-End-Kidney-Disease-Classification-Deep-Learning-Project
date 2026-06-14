@@ -1,9 +1,9 @@
-import os
-import urllib.request as request
-from zipfile import ZipFile
 import tensorflow as tf
-import time
+import numpy as np
+import math
 from pathlib import Path
+import matplotlib.pyplot as plt
+from sklearn.utils.class_weight import compute_class_weight
 from KidneyDiseaseClassification.entity.config_entity import TrainingConfig
 
 class Training:
@@ -18,7 +18,6 @@ class Training:
     def train_valid_generator(self):
 
         datagenerator_kwargs = dict(
-            rescale = 1./255,
             validation_split = 0.20
         )
 
@@ -41,12 +40,12 @@ class Training:
 
         if self.config.params_is_augmentation:
             train_datagenerator = tf.keras.preprocessing.image.ImageDataGenerator(
-                rotation_range = 40,
+                rotation_range = 15,
                 horizontal_flip = True,
-                width_shift_range = 0.2,
-                height_shift_range = 0.2,
-                shear_range = 0.2,
-                zoom_range = 0.2,
+                width_shift_range = 0.1,
+                height_shift_range = 0.1,
+                shear_range = 0.1,
+                zoom_range = 0.1,
                 **datagenerator_kwargs
             )
         else:
@@ -59,24 +58,78 @@ class Training:
             **dataflow_kwargs
         )
 
-    @staticmethod
-    def save_model(path:Path , model:tf.keras.Model):
-        model.save(path)
+    def get_class_weights(self):
+        return {
+        0: 1.0,   # Normal
+        1: 2.5    # Tumor — 2.5x penalty for missing tumors
+        }
+
+    def get_callbacks(self):
+        return [
+            tf.keras.callbacks.EarlyStopping(
+                monitor = 'val_loss',
+                patience = 5,
+                restore_best_weights = True
+            ),
+            tf.keras.callbacks.ModelCheckpoint(
+                filepath = str(self.config.trained_model_path),
+                monitor = 'val_accuracy',
+                save_best_only = True
+            ),
+            tf.keras.callbacks.ReduceLROnPlateau(
+                monitor = 'val_loss',
+                factor = 0.5,
+                patience = 3,
+                min_lr = 1e-7
+            )
+        ]
+    
+    def plot_training(self, history):
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        ax.plot(history.history['accuracy'], label='Train Accuracy')
+        ax.plot(history.history['val_accuracy'], label='Val Accuracy')
+        ax.plot(history.history['loss'], label='Train Loss')
+        ax.plot(history.history['val_loss'], label='Val Loss')
+
+        ax.set_title('Training History')
+        ax.set_xlabel('Epoch')
+        ax.legend()
+
+        plt.tight_layout()
+        plt.savefig('training_plot.png')
+        print("Plot saved as training_plot.png")
 
     def train(self):
-        self.step_per_epochs = self.train_generator.samples // self.train_generator.batch_size
-        self.validation_step = self.valid_generator.samples // self.valid_generator.batch_size
+        self.step_per_epochs = math.ceil(self.train_generator.samples / self.train_generator.batch_size)
+        self.validation_step = math.ceil(self.valid_generator.samples / self.valid_generator.batch_size)
 
-        self.model.fit(
+        history = self.model.fit(
             self.train_generator,
             epochs = self.config.params_epochs,
             steps_per_epoch = self.step_per_epochs,
             validation_steps = self.validation_step,
             validation_data = self.valid_generator,
+            class_weight = self.get_class_weights(), 
+            callbacks = self.get_callbacks()
         )
+
+        self.plot_training(history=history)
 
         self.save_model(
             path=self.config.trained_model_path,
             model= self.model
         )
+
+        self.save_model_for_github(self.model)
+    
+    @staticmethod
+    def save_model_for_github(model: tf.keras.Model):
+        save_dir = Path("model")
+        save_dir.mkdir(parents=True, exist_ok=True)
+        model.save(save_dir / "model.keras")
+
+    @staticmethod
+    def save_model(path:Path , model:tf.keras.Model):
+        model.save(path)
 
