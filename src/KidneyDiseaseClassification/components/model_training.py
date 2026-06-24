@@ -59,10 +59,13 @@ class Training:
         )
 
     def get_class_weights(self):
-        return {
-        0: 1.0,   # Normal
-        1: 2.5    # Tumor — 2.5x penalty for missing tumors
-        }
+        labels = self.train_generator.classes
+        weights = compute_class_weight(
+            class_weight='balanced',
+            classes=np.unique(labels),
+            y=labels
+        )
+        return dict(enumerate(weights))
 
     def get_callbacks(self):
         return [

@@ -4,7 +4,7 @@ from KidneyDiseaseClassification.utils.logger import logger
 from KidneyDiseaseClassification.utils.exception import CustomException
 import sys
 
-STAGE_NAME = "Data Inegstion "
+STAGE_NAME = "Data Inegstion"
 
 class DataIngestionTrainingPipeline:
     def __init__(self):
